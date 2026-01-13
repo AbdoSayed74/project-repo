@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+  backend:
+    image: ghcr.io/${GITHUB_ACTOR}/backend-image:latest
+    ports:
+      - "5000:8080"
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+
+  frontend:
+    image: ghcr.io/${GITHUB_ACTOR}/frontend-image:latest
+    ports:
+      - "8080:80"
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
