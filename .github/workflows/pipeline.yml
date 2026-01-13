@@ -1,0 +1,24 @@
+name: Main Multi-Stack Pipeline
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-backend:
+    uses: AbdoSayed74/centralized-automation-repo/.github/workflows/dotnet.yml@main
+    with:
+      project-path: "./backend"
+      dotnet-version: "8.0"
+
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Build React and Push
+        uses: AbdoSayed74/centralized-automation-repo/.github/actions/react-docker-s2i@main
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          image-name: "frontend-image"
