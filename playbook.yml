@@ -1,0 +1,7 @@
+- name: Deploy to Local Dev
+  hosts: localhost
+  tasks:
+    - name: Docker Login
+      shell: echo "{{ github_token }}" | docker login ghcr.io -u "{{ github_actor }}" --password-stdin
+    - name: Run Compose
+      shell: docker compose up -d
