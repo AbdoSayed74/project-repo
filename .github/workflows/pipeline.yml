@@ -32,14 +32,16 @@ jobs:
           image-name: ${{ github.repository }}/frontend
           tag: latest
 
-  build-backend:
+  backend-pipeline:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
+
       - name: Build Backend
-        run: dotnet build backend/SimpleApi.csproj
+        run: dotnet build backend/*.csproj
