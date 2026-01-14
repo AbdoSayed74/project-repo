@@ -1,24 +1,49 @@
 name: Main Multi-Stack Pipeline
+
 on:
+  workflow_dispatch:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
 
 jobs:
-  build-backend:
-    uses: AbdoSayed74/centralized-automation-repo/.github/workflows/dotnet.yml@main
-    with:
-      project-path: "./backend"
-      dotnet-version: "8.0"
-
-  build-frontend:
+  build-and-push-frontend:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Build React and Push
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package.json
+
+      - name: Install and Build React
+        working-directory: frontend
+        run: |
+          npm install
+          npm run build
+
+      - name: Build React and Push to GHCR
         uses: AbdoSayed74/centralized-automation-repo/.github/actions/react-docker-s2i@main
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-          image-name: "frontend-image"
+          image-name: ${{ github.repository }}/frontend
+          tag: latest
+
+  build-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build Backend
+        run: dotnet build backend/SimpleApi.csproj
